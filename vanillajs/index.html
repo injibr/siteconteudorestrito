@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Verificacao de Idade</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+</head>
+<body>
+  <div class="container">
+    <h1>Maior de 18 anos?</h1>
+
+    <button class="btn" id="verify-btn" onclick="startVerification()">Verificar</button>
+
+    <div id="qrcode" class="qrcode">
+      <canvas id="qr-canvas"></canvas>
+    </div>
+
+    <div id="spinner" class="spinner"></div>
+
+    <p id="status-text" class="qrcode-text"></p>
+
+    <button class="btn btn--outline" id="retry-btn" onclick="startVerification()">Tentar novamente</button>
+  </div>
+
+  <script>
+    const VERIFY_SERVICE_URL = "/v1/verify";
+
+    const PRESENTATION_DEFINITION = {
+      id: "eca-age-verification",
+      purpose: "Verificação de idade conforme o Estatuto da Criança e do Adolescente",
+      format: { ldp_vc: { proof_type: ["Ed25519Signature2020"] } },
+      input_descriptors: [{
+        id: "eca credential",
+        format: { ldp_vc: { proof_type: ["Ed25519Signature2020"] } },
+        constraints: {
+          fields: [{ path: ["$.type"], filter: { type: "object", pattern: "ECACredential" } }]
+        }
+      }]
+    };
+
+    const VP_FORMATS = {
+      ldp_vp: {
+        proof_type: ["Ed25519Signature2018", "Ed25519Signature2020", "RsaSignature2018"]
+      }
+    };
+
+    let isActive = false;
+
+    function showElement(id) {
+      document.getElementById(id).classList.add("visible");
+    }
+
+    function hideElement(id) {
+      document.getElementById(id).classList.remove("visible");
+    }
+
+    function setStatusText(text) {
+      const el = document.getElementById("status-text");
+      el.textContent = text;
+      showElement("status-text");
+    }
+
+    function resetUI() {
+      hideElement("qrcode");
+      hideElement("spinner");
+      hideElement("status-text");
+      hideElement("retry-btn");
+      showElement("verify-btn");
+      isActive = false;
+    }
+
+    function showError(msg) {
+      hideElement("spinner");
+      hideElement("qrcode");
+      setStatusText(msg);
+      showElement("retry-btn");
+      hideElement("verify-btn");
+      isActive = false;
+    }
+
+    async function startVerification() {
+      if (isActive) return;
+      isActive = true;
+
+      hideElement("qrcode");
+      hideElement("retry-btn");
+      hideElement("verify-btn");
+      showElement("spinner");
+      setStatusText("Criando solicitação...");
+
+      try {
+        // 1. Create VP request
+        const res = await fetch(VERIFY_SERVICE_URL + "/vp-request", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            clientId: window.location.origin,
+            nonce: btoa(Date.now().toString()),
+            presentationDefinition: PRESENTATION_DEFINITION
+          })
+        });
+
+        if (res.status !== 201) throw new Error("Falha ao criar VP request");
+
+        const data = await res.json();
+        const { requestId, transactionId } = data;
+        console.log("requestId:", requestId, "transactionId:", transactionId);
+
+        // 2. Build openid4vp:// URL
+        const params = new URLSearchParams();
+        params.set("client_id", window.location.origin);
+
+        if (data.requestUri) {
+          params.set("request_uri", data.requestUri);
+        } else if (data.authorizationDetails) {
+          params.set("state", requestId);
+          params.set("response_mode", data.authorizationDetails.responseMode);
+          params.set("response_type", data.authorizationDetails.responseType);
+          params.set("nonce", data.authorizationDetails.nonce);
+          params.set("response_uri", data.authorizationDetails.responseUri);
+          if (data.authorizationDetails.presentationDefinitionUri) {
+            params.set("presentation_definition_uri",
+              VERIFY_SERVICE_URL + data.authorizationDetails.presentationDefinitionUri);
+          } else {
+            params.set("presentation_definition",
+              JSON.stringify(data.authorizationDetails.presentationDefinition));
+          }
+          params.set("client_metadata", JSON.stringify({
+            client_name: window.location.origin,
+            vp_formats: VP_FORMATS
+          }));
+        }
+
+        const qrData = "openid4vp://authorize?" + params.toString();
+
+        // 3. Generate QR code
+        const canvas = document.getElementById("qr-canvas");
+        await QRCode.toCanvas(canvas, qrData, {
+          width: 200,
+          margin: 2,
+          color: { dark: "#000000", light: "#ffffff" }
+        });
+
+        hideElement("spinner");
+        showElement("qrcode");
+        setStatusText("Use sua carteira digital para verificar a sua idade");
+
+        // 4. Start polling
+        pollStatus(requestId, transactionId);
+
+      } catch (error) {
+        console.error(error);
+        showError("Erro: " + error.message);
+      }
+    }
+
+    async function pollStatus(requestId, transactionId) {
+      if (!isActive) return;
+
+      try {
+        const res = await fetch(
+          VERIFY_SERVICE_URL + "/vp-request/" + requestId + "/status"
+        );
+        if (res.status !== 200) throw new Error("Falha ao consultar status");
+
+        const data = await res.json();
+        console.log("poll status:", data.status);
+
+        if (data.status === "ACTIVE") {
+          pollStatus(requestId, transactionId);
+        } else if (data.status === "VP_SUBMITTED") {
+          hideElement("qrcode");
+          showElement("spinner");
+          setStatusText("Credencial recebida, verificando...");
+          fetchResult(transactionId);
+        } else if (data.status === "EXPIRED") {
+          showError("QR code expirou. Tente novamente.");
+        }
+      } catch (error) {
+        console.error(error);
+        showError("Erro ao verificar status: " + error.message);
+      }
+    }
+
+    async function fetchResult(transactionId) {
+      if (!isActive) return;
+
+      try {
+        const res = await fetch(
+          VERIFY_SERVICE_URL + "/vp-result/" + transactionId
+        );
+        const data = await res.json();
+        if (res.status !== 200) throw new Error(data.errorMessage || "Falha ao obter resultado");
+
+        const vcResults = data.vcResults;
+        if (!vcResults || vcResults.length === 0) {
+          throw new Error("Nenhum resultado de verificação recebido");
+        }
+
+        // Check verification status and isOver18
+        const vcResult = vcResults[0];
+        const vc = typeof vcResult.vc === "string" ? JSON.parse(vcResult.vc) : vcResult.vc;
+        const isValid = vcResult.verificationStatus === "SUCCESS";
+        const isOver18 = vc && vc.credentialSubject && vc.credentialSubject.isOver18 === true;
+
+        if (isValid && isOver18) {
+          window.location.href = "conteudo_adulto/";
+        } else {
+          window.location.href = "nao/";
+        }
+      } catch (error) {
+        console.error(error);
+        showError("Erro na verificação: " + error.message);
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,13 @@
+:5500 {
+	handle /v1/verify/* {
+		reverse_proxy localhost:8080
+	}
+	handle /eca-context.jsonld {
+		root * ..
+		file_server
+	}
+	handle {
+		root * .
+		file_server
+	}
+}

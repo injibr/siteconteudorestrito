@@ -1,0 +1,6 @@
+{
+  "@context": {
+    "ECACredential": "https://example.org/eca#ECACredential",
+    "isOver18": "https://example.org/eca#isOver18"
+  }
+}
