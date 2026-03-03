@@ -25,7 +25,7 @@
   </div>
 
   <script>
-    const VERIFY_SERVICE_URL = "/v1/verify";
+    const VERIFY_SERVICE_URL = "https://verify.pernacabeluda.online/v1/verify";
 
     const PRESENTATION_DEFINITION = {
       id: "eca-age-verification",
@@ -96,7 +96,7 @@
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            clientId: window.location.origin,
+            clientId: "did:web:verify.pernacabeluda.online:v1:verify",
             nonce: btoa(Date.now().toString()),
             presentationDefinition: PRESENTATION_DEFINITION
           })
@@ -110,7 +110,7 @@
 
         // 2. Build openid4vp:// URL
         const params = new URLSearchParams();
-        params.set("client_id", window.location.origin);
+        params.set("client_id", "did:web:verify.pernacabeluda.online:v1:verify");
 
         if (data.requestUri) {
           params.set("request_uri", data.requestUri);
@@ -128,7 +128,7 @@
               JSON.stringify(data.authorizationDetails.presentationDefinition));
           }
           params.set("client_metadata", JSON.stringify({
-            client_name: window.location.origin,
+            client_name: "did:web:verify.pernacabeluda.online:v1:verify",
             vp_formats: VP_FORMATS
           }));
         }
