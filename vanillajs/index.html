@@ -13,9 +13,7 @@
 
     <button class="btn" id="verify-btn" onclick="startVerification()">Verificar</button>
 
-    <div id="qrcode" class="qrcode">
-      <canvas id="qr-canvas"></canvas>
-    </div>
+    <div id="qrcode" class="qrcode"></div>
 
     <div id="spinner" class="spinner"></div>
 
@@ -135,13 +133,14 @@
 
         const qrData = "openid4vp://authorize?" + params.toString();
 
-        // 3. Generate QR code
-        const canvas = document.getElementById("qr-canvas");
-        await QRCode.toCanvas(canvas, qrData, {
+        // 3. Generate QR code as SVG
+        const svgString = await QRCode.toString(qrData, {
+          type: 'svg',
           width: 200,
           margin: 2,
           color: { dark: "#000000", light: "#ffffff" }
         });
+        document.getElementById("qrcode").innerHTML = svgString;
 
         hideElement("spinner");
         showElement("qrcode");
