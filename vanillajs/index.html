@@ -108,16 +108,16 @@
 
         // 2. Build openid4vp:// URL
         const params = new URLSearchParams();
-        params.set("client_id", "did:web:verify.pernacabeluda.online:v1:verify");
+        params.set("client_id", data.authorizationDetails.clientId);
 
         if (data.requestUri) {
           params.set("request_uri", data.requestUri);
         } else if (data.authorizationDetails) {
           params.set("state", requestId);
-          params.set("response_mode", data.authorizationDetails.responseMode);
           params.set("response_type", data.authorizationDetails.responseType);
+          params.set("response_mode", "direct_post");
           params.set("nonce", data.authorizationDetails.nonce);
-          params.set("response_uri", data.authorizationDetails.responseUri);
+          params.set("response_uri", VERIFY_SERVICE_URL + data.authorizationDetails.responseUri);
           if (data.authorizationDetails.presentationDefinitionUri) {
             params.set("presentation_definition_uri",
               VERIFY_SERVICE_URL + data.authorizationDetails.presentationDefinitionUri);
@@ -126,7 +126,7 @@
               JSON.stringify(data.authorizationDetails.presentationDefinition));
           }
           params.set("client_metadata", JSON.stringify({
-            client_name: "did:web:verify.pernacabeluda.online:v1:verify",
+            client_name: window.location.origin,
             vp_formats: VP_FORMATS
           }));
         }
@@ -136,7 +136,8 @@
         // 3. Generate QR code as SVG
         const svgString = await QRCode.toString(qrData, {
           type: 'svg',
-          width: 200,
+          errorCorrectionLevel: 'L',
+          width: 320,
           margin: 2,
           color: { dark: "#000000", light: "#ffffff" }
         });
