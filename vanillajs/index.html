@@ -169,11 +169,13 @@
         console.log("poll status:", data.status);
 
         if (data.status === "ACTIVE") {
+          await new Promise(r => setTimeout(r, 1000));
           pollStatus(requestId, transactionId);
         } else if (data.status === "VP_SUBMITTED") {
           hideElement("qrcode");
           showElement("spinner");
           setStatusText("Credencial recebida, verificando...");
+          await new Promise(r => setTimeout(r, 2000));
           fetchResult(transactionId);
         } else if (data.status === "EXPIRED") {
           showError("QR code expirou. Tente novamente.");
@@ -201,9 +203,16 @@
 
         // Check verification status and isOver18
         const vcResult = vcResults[0];
-        const vc = typeof vcResult.vc === "string" ? JSON.parse(vcResult.vc) : vcResult.vc;
         const isValid = vcResult.verificationStatus === "SUCCESS";
-        const isOver18 = vc && vc.credentialSubject && vc.credentialSubject.isOver18 === true;
+        let isOver18 = false;
+        try {
+          const vc = typeof vcResult.vc === "string" ? JSON.parse(vcResult.vc) : vcResult.vc;
+          // Handle both structures: vc.credentialSubject (W3C) and vc.credential.credentialSubject (INJI wrapper)
+          const subject = vc?.credentialSubject ?? vc?.credential?.credentialSubject;
+          isOver18 = subject?.isOver18 === true;
+        } catch (e) {
+          console.error("Erro ao parsear VC:", e);
+        }
 
         if (isValid && isOver18) {
           window.location.href = "conteudo_adulto/";

@@ -3,12 +3,38 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Saia</title>
+  <title>Acesso Negado</title>
   <link rel="stylesheet" href="../styles.css">
+  <style>
+    body { background: #7f1d1d; }
+    .feedback-icon {
+      font-size: 5rem;
+      border: 4px solid #fff;
+      padding: 1.5rem 2rem;
+      display: inline-block;
+      margin-bottom: 2rem;
+      background: #000;
+    }
+    .feedback-title {
+      font-size: 2.5rem;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      margin-bottom: 1rem;
+      color: #fca5a5;
+    }
+    .feedback-body {
+      font-size: 1.1rem;
+      color: #fee2e2;
+      margin-bottom: 2.5rem;
+    }
+  </style>
 </head>
 <body>
   <div class="container">
-    <pre style="font-size: 3rem; line-height: 1.2;">¯\_(ツ)_/¯</pre>
+    <div class="feedback-icon">🚫</div>
+    <p class="feedback-title">Acesso negado</p>
+    <p class="feedback-body">Você precisa ter 18 anos ou mais.</p>
+    <a href="../" class="btn btn--outline">← Voltar</a>
   </div>
 </body>
 </html>
