@@ -58,14 +58,15 @@ export default function App() {
   }, []);
 
   const handleVPProcessed = useCallback((results: VerificationResults) => {
-    const result = results[0];
+    const result = (results.vcResults?.[0]) as Record<string, unknown> | undefined;
     if (!result) {
       window.location.href = "/nao/";
       return;
     }
 
     const vc = result.vc as Record<string, unknown>;
-    const subject = vc.credentialSubject as Record<string, unknown> | undefined;
+    const credential = (vc.credential ?? vc) as Record<string, unknown>;
+    const subject = credential.credentialSubject as Record<string, unknown> | undefined;
     const status = result.vcStatus as string;
     const isValid = status === "valid" || status === "SUCCESS";
     const isOver18 = subject?.isOver18 === true;
