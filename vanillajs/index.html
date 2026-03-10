@@ -203,7 +203,8 @@
         const vcResult = vcResults[0];
         const vc = typeof vcResult.vc === "string" ? JSON.parse(vcResult.vc) : vcResult.vc;
         const isValid = vcResult.verificationStatus === "SUCCESS";
-        const isOver18 = vc && vc.credentialSubject && vc.credentialSubject.isOver18 === true;
+        const credential = vc.credential ?? vc;
+        const isOver18 = credential?.credentialSubject?.isOver18 === true;
 
         if (isValid && isOver18) {
           window.location.href = "conteudo_adulto/";
