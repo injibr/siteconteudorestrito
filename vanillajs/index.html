@@ -23,7 +23,7 @@
   </div>
 
   <script>
-    const VERIFY_SERVICE_URL = "https://verify.pernacabeluda.online/v1/verify";
+    const VERIFY_SERVICE_URL = "https://credenciaisverificaveis-dev.dataprev.gov.br/v1/verify";
 
     const PRESENTATION_DEFINITION = {
       id: "eca-age-verification",
@@ -94,7 +94,7 @@
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            clientId: "did:web:verify.pernacabeluda.online:v1:verify",
+            clientId: "did:web:credenciaisverificaveis-dev.dataprev.gov.br:v1:verify",
             nonce: btoa(Date.now().toString()),
             presentationDefinition: PRESENTATION_DEFINITION
           })
