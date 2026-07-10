@@ -103,14 +103,15 @@
         if (res.status !== 201) throw new Error("Falha ao criar VP request");
 
         const data = await res.json();
-        const { requestId, transactionId } = data;
+        const { requestId, transactionId, requestUri } = data;
+        if (!requestUri) throw new Error("Backend não retornou requestUri");
         console.log("requestId:", requestId, "transactionId:", transactionId);
 
         // 2. Build openid4vp:// URL
         const params = new URLSearchParams();
-        params.set("client_id", data.authorizationDetails.clientId);
-
-        if (data.requestUri) {
+        params.set("client_id", "did:web:injiverify.credenciaisverificaveis-dev.dataprev.gov.br:v1:verify");
+        
+         if (data.requestUri) {
           params.set("request_uri", data.requestUri);
         } else if (data.authorizationDetails) {
           params.set("state", requestId);
