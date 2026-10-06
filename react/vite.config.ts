@@ -10,7 +10,7 @@ function staticPages(): Plugin {
     name: "static-pages",
     configureServer(server) {
       server.middlewares.use((req, _res, next) => {
-        const staticRoutes = ["/nao/", "/conteudo_adulto/"];
+        const staticRoutes = ["/nao/", "/conteudo_restrito/"];
         if (req.url && staticRoutes.some((r) => req.url!.startsWith(r))) {
           const htmlPath = path.join(
             process.cwd(),

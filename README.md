@@ -62,7 +62,7 @@ cd perna/scripts
 # Instalar dependencias (primeira vez)
 npm install
 
-# Happy path: isOver18=true, assinatura valida → /conteudo_adulto/
+# Happy path: isOver18=true, assinatura valida → /conteudo_restrito/
 node simulate-wallet-happy.mjs req_xxx
 
 # Unhappy path: isOver18=false → /nao/
@@ -95,7 +95,7 @@ Usuario               Webapp              Backend (Docker)        Wallet (script
   |                     |<-- vcStatus, vc ------|                      |
   |                     |                      |                      |
   |<-- Redirect --------|                      |                      |
-  |  /conteudo_adulto/ (SUCCESS + isOver18)                           |
+  |  /conteudo_restrito/ (SUCCESS + isOver18)                           |
   |  /nao/             (caso contrario)                               |
 ```
 
@@ -165,7 +165,7 @@ cd perna/scripts
 # Install dependencies (first time)
 npm install
 
-# Happy path: isOver18=true, valid signature → /conteudo_adulto/
+# Happy path: isOver18=true, valid signature → /conteudo_restrito/
 node simulate-wallet-happy.mjs req_xxx
 
 # Unhappy path: isOver18=false → /nao/
@@ -198,6 +198,6 @@ User                  Webapp              Backend (Docker)        Wallet (script
   |                     |<-- vcStatus, vc ------|                      |
   |                     |                      |                      |
   |<-- Redirect --------|                      |                      |
-  |  /conteudo_adulto/ (SUCCESS + isOver18)                           |
+  |  /conteudo_restrito/ (SUCCESS + isOver18)                           |
   |  /nao/             (otherwise)                                    |
 ```

@@ -27,7 +27,7 @@ cd perna/scripts && node simulate-wallet-happy.mjs req_xxx
 3. `pollStatus()` faz polling em `/v1/verify/vp-request/{requestId}/status`
 4. Quando o status e `VP_SUBMITTED`, busca o resultado em `/v1/verify/vp-result/{transactionId}`
 5. Verifica `verificationStatus === "SUCCESS"` e `credentialSubject.isOver18 === true`
-6. Redireciona para `/conteudo_adulto/` ou `/nao/`
+6. Redireciona para `/conteudo_restrito/` ou `/nao/`
 
 ## Arquivos
 
@@ -68,7 +68,7 @@ cd perna/scripts && node simulate-wallet-happy.mjs req_xxx
 3. `pollStatus()` polls `/v1/verify/vp-request/{requestId}/status`
 4. When status is `VP_SUBMITTED`, fetches result from `/v1/verify/vp-result/{transactionId}`
 5. Checks `verificationStatus === "SUCCESS"` and `credentialSubject.isOver18 === true`
-6. Redirects to `/conteudo_adulto/` or `/nao/`
+6. Redirects to `/conteudo_restrito/` or `/nao/`
 
 ## Files
 
