@@ -1,4 +1,4 @@
-# Perna - Verificacao de Idade com Credenciais Verificaveis
+# Verificacao de Idade com Credenciais Verificaveis
 
 Prova de conceito de verificacao de idade usando o protocolo OpenID4VP (Verifiable Presentations). Um usuario apresenta uma credencial digital (ECACredential) que comprova ser maior de 18 anos, sem revelar sua identidade.
 
@@ -11,7 +11,7 @@ Prova de conceito de verificacao de idade usando o protocolo OpenID4VP (Verifiab
 ## Estrutura
 
 ```
-perna/
+siteconteudorestrito/
   eca-context.jsonld          # JSON-LD context da credencial ECA
   Caddyfile                   # Caddy: serve eca-context.jsonld na porta 5500
   vanillajs/                  # Implementacao vanilla JS
@@ -32,7 +32,7 @@ cd inji-verify/docker-compose && docker compose up -d
 O backend precisa buscar o `eca-context.jsonld` via HTTP para validar as assinaturas das credenciais. De dentro do Docker, ele acessa `http://host.docker.internal:5500/eca-context.jsonld`. O Caddy serve esse arquivo.
 
 ```bash
-cd perna && caddy run
+cd siteconteudorestrito && caddy run
 ```
 
 Isso e necessario tanto para a versao vanilla JS quanto para a versao React.
@@ -57,7 +57,7 @@ Como nao temos uma wallet real, usamos scripts que simulam o comportamento de um
 3. Rode o script:
 
 ```bash
-cd perna/scripts
+cd siteconteudorestrito/scripts
 
 # Instalar dependencias (primeira vez)
 npm install
@@ -101,7 +101,7 @@ Usuario               Webapp              Backend (Docker)        Wallet (script
 
 ---
 
-# Perna - Age Verification with Verifiable Credentials
+# SiteConteudoRestrito - Age Verification with Verifiable Credentials
 
 Proof of concept for age verification using the OpenID4VP (Verifiable Presentations) protocol. A user presents a digital credential (ECACredential) proving they are over 18, without revealing their identity.
 
@@ -114,7 +114,7 @@ Proof of concept for age verification using the OpenID4VP (Verifiable Presentati
 ## Structure
 
 ```
-perna/
+siteconteudorestrito/
   eca-context.jsonld          # ECA credential JSON-LD context
   Caddyfile                   # Caddy: serves eca-context.jsonld on port 5500
   vanillajs/                  # Vanilla JS implementation
@@ -135,7 +135,7 @@ cd inji-verify/docker-compose && docker compose up -d
 The backend needs to fetch `eca-context.jsonld` over HTTP to validate credential signatures. From inside Docker, it accesses `http://host.docker.internal:5500/eca-context.jsonld`. Caddy serves this file.
 
 ```bash
-cd perna && caddy run
+cd siteconteudorestrito && caddy run
 ```
 
 This is required for both the vanilla JS and the React versions.
@@ -160,7 +160,7 @@ Since we don't have a real wallet, we use scripts that simulate a digital wallet
 3. Run the script:
 
 ```bash
-cd perna/scripts
+cd siteconteudorestrito/scripts
 
 # Install dependencies (first time)
 npm install
