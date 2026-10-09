@@ -75,6 +75,19 @@ node simulate-wallet-unhappy.mjs req_xxx
 |---|---|---|
 | `VERIFY_SERVICE_URL` | `http://localhost:8080/v1/verify` | URL do backend |
 | `CONTEXT_PORT` | `5500` | Porta do Caddy servindo `eca-context.jsonld` |
+| `ECA_CONTEXT_URL` | `http://host.docker.internal:<CONTEXT_PORT>/eca-context.jsonld` | URL publica do `eca-context.jsonld` (sobrescreve `CONTEXT_PORT`) |
+
+## GitHub Pages
+
+O workflow `.github/workflows/pages.yml` publica `vanillajs/` e `eca-context.jsonld` a cada push em `main`, em https://injibr.github.io/siteconteudorestrito/. O site usa o backend de homologacao da Dataprev.
+
+Para simular a wallet contra esse ambiente:
+
+```bash
+VERIFY_SERVICE_URL=https://injiverify.credenciaisverificaveis-hml.dataprev.gov.br/v1/verify \
+  ECA_CONTEXT_URL=https://injibr.github.io/siteconteudorestrito/eca-context.jsonld \
+  node simulate-wallet-happy.mjs req_xxx
+```
 
 ## Fluxo de verificacao
 
@@ -178,6 +191,7 @@ node simulate-wallet-unhappy.mjs req_xxx
 |---|---|---|
 | `VERIFY_SERVICE_URL` | `http://localhost:8080/v1/verify` | Backend URL |
 | `CONTEXT_PORT` | `5500` | Caddy port serving `eca-context.jsonld` |
+| `ECA_CONTEXT_URL` | `http://host.docker.internal:<CONTEXT_PORT>/eca-context.jsonld` | Public URL of `eca-context.jsonld` (overrides `CONTEXT_PORT`) |
 
 ## Verification flow
 
