@@ -23,10 +23,14 @@ const VERIFY_SERVICE_URL =
   process.env.VERIFY_SERVICE_URL || "http://localhost:8080/v1/verify";
 const REQUEST_ID = process.argv[2];
 const CONTEXT_PORT = process.env.CONTEXT_PORT || "5500";
+const ECA_CONTEXT_URL =
+  process.env.ECA_CONTEXT_URL ||
+  `http://host.docker.internal:${CONTEXT_PORT}/eca-context.jsonld`;
 
 if (!REQUEST_ID) {
   console.error("Usage: node simulate-wallet-happy.mjs <requestId>");
   console.error("  Env: CONTEXT_PORT=<port> (default: 5500, the Caddy port serving eca-context.jsonld)");
+  console.error("       ECA_CONTEXT_URL=<url> (default: http://host.docker.internal:<CONTEXT_PORT>/eca-context.jsonld)");
   process.exit(1);
 }
 
@@ -149,7 +153,7 @@ const CONTEXTS = {
 };
 
 // ECA context (same content as perna/eca-context.jsonld)
-CONTEXTS[`http://host.docker.internal:${CONTEXT_PORT}/eca-context.jsonld`] = {
+CONTEXTS[ECA_CONTEXT_URL] = {
   "@context": {
     ECACredential: "https://example.org/eca#ECACredential",
     isOver18: "https://example.org/eca#isOver18",
@@ -253,9 +257,6 @@ async function main() {
 
   // Create the suite for signing
   const suite = new Ed25519Signature2020({ key: keyPair });
-
-  // ECA context served by the webapp; Docker containers access it via host.docker.internal
-  const ECA_CONTEXT_URL = `http://host.docker.internal:${CONTEXT_PORT}/eca-context.jsonld`;
 
   // Create credential with inline context for ECA terms
   const credential = {
